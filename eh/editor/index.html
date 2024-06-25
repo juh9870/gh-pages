@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Basic DB File Editor</title>
+    <script src="https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js"></script>
+    <script src="https://unpkg.com/vanilla-picker@2"></script>
+    <script src="./schema.js"></script>
+    <script src="./download2.js"></script>
+    <style>
+      html,body{
+        height: 200%;
+      }
+      *[data-schematype='string'] input {
+        width: 99%;
+      }
+    </style>
+  <style id="theme-default"></style><style id="theme-html"></style></head>
+  <body>
+    <h1>Basic DB File Editor</h1>
+
+    <input type="file" id="fs" accept="application/JSON">
+    <div id="editor_holder" data-theme="html"></div>
+    <button id="submit">Download file</button>
+
+    <script>
+
+      let swr = (obj,r)=>{
+        for(let key of Object.getOwnPropertyNames(obj)){
+          let val =  obj[key];
+          if(typeof val==="string"){
+            if(val.match(/^#[0-9a-fA-F]{8}$/)){
+              let split = val.match(/[0-9a-fA-F]{2}/g);
+              if(r){
+                split.unshift(split.pop());
+              }else {
+                split.push(split.shift());
+              }
+              obj[key]="#"+split.join("");
+            }
+          } else if (typeof val==="object" || Array.isArray(val)){
+            swr(val,r);
+          }
+        }
+        return obj;
+      }
+
+      let map = {
+          0:"Undefined",
+          1:"Component",
+          2:"Device",
+          3:"Weapon",
+          4:"AmmunitionObsolete",
+          5:"DroneBay",
+          6:"Ship",
+          7:"Satellite",
+          8:"ShipBuild",
+          9:"SatelliteBuild",
+          10:"Technology",
+          11:"ComponentStats",
+          12:"ComponentMod",
+          13:"Skill",
+          14:"Faction",
+          15:"Quest",
+          16:"Loot",
+          18:"Fleet",
+          19:"Character",
+          20:"QuestItem",
+          25:"Ammunition",
+          26:"VisualEffect",
+          27:"BulletPrefab",
+          100:"ShipSettings",
+          101:"GalaxySettings",
+          102:"DatabaseSettings",
+          103:"ExplorationSettings",
+      }
+      // Initialize the editor with a JSON schema
+      var editor = new JSONEditor(document.getElementById('editor_holder'),{
+        schema: window.Schema,
+        // disable_edit_json :true,
+	"object_layout": "table",
+	"template": "default",
+	"show_errors": "interaction",
+	"required_by_default": 1,
+	"no_additional_properties": 0,
+	"display_required_only": 0,
+	"remove_empty_properties": 0,
+	"keep_oneof_values": 0,
+	"ajax": 0,
+	"ajaxCredentials": 0,
+	"show_opt_in": 1,
+	"disable_edit_json": 1,
+	"disable_collapse": 0,
+	"disable_properties": 0,
+	"disable_array_add": 0,
+	"disable_array_reorder": 0,
+	"disable_array_delete": 0,
+	"enable_array_copy": 1,
+	"array_controls_top": 0,
+	"disable_array_delete_all_rows": 0,
+	"disable_array_delete_last_row": 0,
+	"prompt_before_delete": 1
+      });
+        var fileName = "file.json"
+        var fileData={};
+        var targ;
+
+      let marked=false;
+      let clone = (e)=>JSON.parse(JSON.stringify(e));
+      // Hook up the submit button to log to the console
+      document.getElementById('submit').addEventListener('click',function() {
+        // Get the value from the editor
+        download(JSON.stringify(swr(clone(editor.getValue()),true),null,"\t"),fileName,"application/JSON");
+      });
+
+      document.getElementById('fs').addEventListener('change',async e=>{
+        if(!marked){
+          targ = document.getElementsByClassName("je-switcher")[0];
+          merked=true;
+        }
+
+        let file = e.target.files.item(0);
+        fileName=file.name;
+        fileData = swr(JSON.parse(await file.text()),false);
+
+        let type = map[fileData.ItemType];
+        targ.value=type;
+        debugger;
+        targ.dispatchEvent(new Event('change'));
+        editor.setValue(fileData);
+      });
+    </script>
+</body></html>

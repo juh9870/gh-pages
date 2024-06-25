@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PD Map</title>
+	<style type="text/css">
+		.map {
+			position: absolute;
+			left: 0px;
+			top: 50px;
+			width: 1225px;
+		}
+		.biomes {
+			position: absolute;
+			left: 1225px;
+			top: 50px;
+			height: 661px;
+		}
+	</style>
+</head>
+<body>
+<input type="range" min="-3" max="3" value="0" id="slider">
+<img id="-3" class="map" src="./mapn1.png">
+<img id="-2" class="map" src="./mapn2.png">
+<img id="-1" class="map" src="./mapn3.png">
+<img id="0" class="map" src="./mapp0.png">
+<img id="1" class="map" src="./mapp1.png">
+<img id="2" class="map" src="./mapp2.png">
+<img id="3" class="map" src="./mapp3.png">
+<img class="biomes" src="./biomes.png">
+
+
+<script type="text/javascript">
+    
+    let update=()=>{
+        for(let i=-3;i<=3;i++){
+            let e = document.getElementById(i.toString());
+            if(i!=slider.value){
+                e.style.display="none";
+                continue;
+            }
+            e.style.display="";
+        }
+    };
+
+    let slider = document.getElementById("slider");
+	slider.oninput = update;
+    update();
+</script>
+</body>
+</html>

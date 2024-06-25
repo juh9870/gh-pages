@@ -1,0 +1,14 @@
+KNOWN ISSUES (Only Windows of course)
+
+- There is no interaction between the window manager
+  and the program. Please use the program's close or
+  delete functions to closa a graphics window.
+
+- Windoze mouse event handling is error prone.
+  Routines using interactive mouse input in 
+  an idl graphics window might catch a mouse event 
+  in case the mouse cursor is positioned in a 
+  window on top of the graphics window.
+  Simply keep the idl graphics window on top.
+  Does not happen in well behaved Unix environments.
+

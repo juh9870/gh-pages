@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<title>EH Ships gen</title>
+<style>
+	.code{
+		border:1px solid black;
+		word-wrap: break-word;
+		width: 800px;
+	}
+</style></head>
+
+<div>
+	<div>
+		<div>
+			<div>Layout image: <input type="file" id="files" name="file"></div>
+		</div>
+		<div>
+			<div>Ship id: <input type="number" id="id"></div>
+		</div>
+		<div>
+			<div>Ship name: <input type="text" id="name"></div>
+		</div>
+		<div>
+			<div><input type="button" id="gen" value="Generate"></div>
+			<div><input type="button" id="dow" value="Download"></div>
+		</div>
+		<div>
+			<div id="out" ,="" class="code"></div>
+		</div>
+	</div>
+</div>
+
+<script>
+    let curFile;
+
+    String.prototype.replaceAll = function (find, replace) {
+        let str = this;
+        return str.replace(new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), replace);
+    };
+
+    function handleFileSelect(evt) {
+        let file = evt.target.files[0];
+        if(file){
+            curFile=file;
+        }
+    }
+
+    function saveJSON(data, filename){
+
+        if(!data) {
+            console.error('No data');
+            return;
+        }
+
+        if(!filename) filename = 'console.json';
+
+        if(typeof data === "object"){
+            data = JSON.stringify(data, undefined, 4)
+        }
+
+        var blob = new Blob([data], {type: 'text/json'}),
+            e    = document.createEvent('MouseEvents'),
+            a    = document.createElement('a');
+
+        a.download = filename;
+        a.href = window.URL.createObjectURL(blob);
+        a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':');
+        e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        a.dispatchEvent(e);
+    }
+
+    function generate(download){
+
+        let ship =
+            {
+                ItemType: 6,
+                Id: -1,
+                IconImage: "unknown_ship",
+                IconScale: 0.5,
+                Name: "",
+                ModelImage: "space_invader",
+                ModelScale: 1,
+                EnginePosition: {
+                    x: -1
+                },
+                EngineColor: "#000000",
+                EngineSize: 0.1,
+                BuiltinDevices: [],
+                Layout: "",
+                Barrels: []
+            };
+
+        if (!curFile.type.match('image.*')) {
+            return;
+        }
+
+        let image = new Image();
+
+        image.onload = function() {
+
+            if(image.width!==image.height){
+                alert("Your image is not square");
+                return;
+            }
+
+            reader.onload = (function(theFile) {
+                return function(e) {
+
+                    let canvas = document.createElement("canvas");
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+                    let ctx = canvas.getContext("2d");
+
+                    ctx.drawImage(image,0,0);
+
+                    let imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+                    var pix = imgData.data;
+
+                    for (var i = 0; n = pix.length, i < n; i += 4) {
+                        let r = pix[i  ];
+                        let g = pix[i+1];
+                        let b = pix[i+2];
+                        let a = pix[i+3];
+                        if (a<200||(r>127&&g>127&&b>127)){
+                            ship.Layout+="0";
+                            continue;
+                        }
+
+                        if (r>127&&g<=127&&b<=127)ship.Layout+="4";
+                        else if(b>127&&g<=127&&r<=127)ship.Layout+="1";
+                        else if(g>127&&r<=127&&b<=127)ship.Layout+="2";
+                        else if(g>127&&b>127&&r<=127)ship.Layout+="3";
+                        else if(r>127&&g>127&&b<=127)ship.Layout+="5";
+                        else ship.Layout+="0";
+                    }
+
+                    ship.Id=document.getElementById("id").value;
+                    ship.Name=document.getElementById("name").value;
+
+                    let txt = JSON.stringify(ship,null,4).replaceAll("\n","<br>");
+                    document.getElementById("out").innerHTML = txt;
+
+                    if(download){
+                        saveJSON(ship,ship.Name+".json");
+                    }
+
+
+                };
+            })(curFile);
+
+            reader.readAsDataURL(curFile);
+        };
+
+        image.src = URL.createObjectURL(curFile);
+
+        let reader = new FileReader();
+    }
+	function gen(){generate(false)}
+	function dow(){generate(true)}
+    document.getElementById('files').addEventListener('change', handleFileSelect, false);
+    document.getElementById('gen').addEventListener("click", gen);
+    document.getElementById('dow').addEventListener("click", dow);
+</script>
+</body></html>

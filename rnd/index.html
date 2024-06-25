@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+  <head>  
+    <title>random chart</title>
+    <style type="text/css">
+      body{
+        background-color: #2b2b2b;
+      }
+      .generateButton{
+          background-color: #222;
+          border: 2px solid #222;
+          color: white;
+          padding: 15px 32px;
+          margin-bottom: 5px;
+          text-align: center;
+          font-size: 16px;
+          -webkit-transition-duration: 0.4s;
+          transition-duration: 0.4s;
+      }
+      .generateButton:hover{
+          background-color: #111;
+          border: 2px solid #222
+      }
+      #code{
+        width:200px;
+        height:100px;
+      }
+    </style>
+    <script>
+      let chart;
+      let myCodeMirror;
+
+      function showError(text){
+        let el = document.getElementsByTagName("span")[0];
+        el.innerHTML = text;
+        el.parentElement.classList.remove("hidden");
+      }
+
+      window.onload = function () {
+        chart = new CanvasJS.Chart("chartContainer", {
+          animationEnabled: true,
+          theme: "dark1",
+          title:{
+            text: "Random generator chart"
+          },
+          axisY:{
+            includeZero: false,
+            minimum:0
+          },
+          data: [{        
+            type: "line"
+          }]
+        });
+        myCodeMirror = CodeMirror.fromTextArea(document.getElementById('code'), {
+          theme: "darcula",
+          lineNumbers: true
+        });
+
+        let url = new URL(window.location.href);
+        let c = url.searchParams.get("code");
+        if (c) {
+          myCodeMirror.setValue(c);
+        }
+
+        drawChart();
+      }
+      drawChart = function(){
+        try {
+          myRandom = new Function(myCodeMirror.getValue());
+        } catch(e){
+          alert("There is an error in your code.");
+          return;
+        }
+
+        let diceRolls = 1000000;
+
+        let dataPoints = new Array(100).fill(0).map((e,i)=>{return {x:i,y:0}});
+
+        for(i=0;i<diceRolls;i++){
+          let x = Math.floor(myRandom()*100);
+          if (x<0||x>=100){
+            alert("Your code generates numbers out of [0,1) bounds");
+            return;
+          }
+          dataPoints[x].y++;
+        }
+        dataPoints.forEach(e=>e.x/=100)
+        chart.options.data[0].dataPoints=dataPoints;
+        chart.options.axisY.maximum=Math.max(diceRolls/50,dataPoints.reduce((e,a)=>e.y>a.y?e:a,{y:0}).y);
+        chart.render();
+
+      }
+    </script>
+    <script src="lib/codemirror.js"></script>
+    <link rel="stylesheet" href="lib/codemirror.css">
+    <link rel="stylesheet" href="theme/darcula.css">
+    <link rel="stylesheet" href="dropdown.css">
+    <script src="mode/javascript/javascript.js"></script>
+  </head>
+  <body>
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <button class="generateButton" onclick="
+      drawChart()
+    ">Draw chart</button>
+    <div class="dropdown">
+      <div class="dropdown-content">
+        <a href="?code=return%20Math.random%28%29%3B">Regular random</a>
+        <a href="?code=return%20%28Math.random%28%29%2BMath.random%28%29%29%2F2%3B">Double random</a>
+        <a href="?code=return%20%28Math.random%28%29%2BMath.random%28%29%2BMath.random%28%29%29%2F3%3B">Triple random</a>
+        <a href="?code=function%20randn_bm%28%29%20%7B%0A%20%20%20%20var%20u%20%3D%200%2C%20v%20%3D%200%3B%0A%20%20%20%20while%28u%20%3D%3D%3D%200%29%20u%20%3D%20Math.random%28%29%3B%20%2F%2FConverting%20%5B0%2C1%29%20to%20%280%2C1%29%0A%20%20%20%20while%28v%20%3D%3D%3D%200%29%20v%20%3D%20Math.random%28%29%3B%0A%20%20%20%20let%20num%20%3D%20Math.sqrt%28%20-2.0%20%2A%20Math.log%28%20u%20%29%20%29%20%2A%20Math.cos%28%202.0%20%2A%20Math.PI%20%2A%20v%20%29%3B%0A%20%20%20%20num%20%3D%20num%20%2F%2010.0%20%2B%200.5%3B%20%2F%2F%20Translate%20to%200%20-%3E%201%0A%20%20%20%20if%20%28num%20%3E%201%20%7C%7C%20num%20%3C%200%29%20return%20randn_bm%28%29%3B%20%2F%2F%20resample%20between%200%20and%201%0A%20%20%20%20return%20num%3B%0A%7D%0A%0Areturn%20randn_bm%28%29%3B">Normal random</a>
+      </div>
+      <button class="dropbtn">Examples</button>
+    </div>
+    <textarea id="code">return Math.random();</textarea>
+    
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  </body>
+</html>

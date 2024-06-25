@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>EH Localization Maker</title>
+</head>
+<body>
+	<script type="text/javascript" src="./lib/jszip.min.js"></script>
+	<script type="text/javascript" src="./lib/download.js"></script>
+
+	<label>Select database .zip archive <input type="file" id="fileInput" accept=".zip"/></label>
+	<input type="button" id="submitButton" value="start">
+	<br>
+	<div>
+		<progress id="progressBar" value="0" max="1">0 %</progress>
+		<br>
+		<span id="progressText">Waiting for file...</span>
+	</div>
+
+	<script>
+
+		window.onerror = function(msg, url, linenumber) {
+			alert('Error: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber);
+			return true;
+		}
+
+		if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
+		  alert('The File APIs are not fully supported in this browser.');
+		  throw "The File APIs are not fully supported in this browser.";
+		}
+
+		let allowedKeys = {
+			Name:true,
+			Description:true,
+			Message:true,
+			ButtonText:true
+		}
+
+		function readFileAsync(file) {
+		  return new Promise((resolve, reject) => {
+			let reader = new FileReader();
+
+			reader.onload = () => {
+			  resolve(reader.result);
+			};
+
+			reader.onerror = reject;
+
+			reader.readAsDataURL(file);
+		  })
+		}
+
+		let localizations = [];
+
+		function walkRecursive(obj,path){
+			for(let k of Object.keys(obj)){
+				let _p = path+"/"+k;
+				if(allowedKeys[k] && typeof(obj[k])==="string" && !obj[k].startsWith("$")){
+					localizations.push([_p,obj[k]])
+					obj[k]="$"+_p;
+				} else if (typeof(obj[k])==="object"){
+					walkRecursive(obj[k],_p);
+				}
+			}
+		}
+
+		let prettifyXml = function(sourceXml)
+		{
+			var xmlDoc = new DOMParser().parseFromString(sourceXml, 'application/xml');
+			var xsltDoc = new DOMParser().parseFromString([
+				// describes how we want to modify the XML - indent everything
+				'<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform">',
+				'	<xsl:strip-space elements="*"/>',
+				'	<xsl:template match="para[content-style][not(text())]">', // change to just text() to strip space in text nodes
+				'		<xsl:value-of select="normalize-space(.)"/>',
+				'	</xsl:template>',
+				'	<xsl:template match="node()|@*">',
+				'		<xsl:copy><xsl:apply-templates select="node()|@*"/></xsl:copy>',
+				'	</xsl:template>',
+				'	<xsl:output indent="yes"/>',
+				'</xsl:stylesheet>',
+			].join('\n'), 'application/xml');
+
+			var xsltProcessor = new XSLTProcessor();    
+			xsltProcessor.importStylesheet(xsltDoc);
+			var resultDoc = xsltProcessor.transformToDocument(xmlDoc);
+			var resultXml = new XMLSerializer().serializeToString(resultDoc);
+			return resultXml;
+		};
+
+		let fileInput = document.getElementById("fileInput");
+		document.getElementById("submitButton").addEventListener("click",async ()=>{
+			let progressBar = document.getElementById("progressBar");
+			let progressText = document.getElementById("progressText");
+			let file = fileInput.files[0];
+			if(!file){
+				progressText.textContent="No file selected";
+				return;
+			}
+			let zip = await JSZip.loadAsync(file);
+
+			let done = 0;
+
+			let tEntries = zip.filter((relPath,file)=>{
+				return file.name.toLowerCase().endsWith(".json");
+			});
+			progressBar.max = tEntries.length;
+
+			for(let file of tEntries){
+
+				progressText.textContent=`Processing ${done+1}/${tEntries.length}, ${file.name}`;
+
+				let content = JSON.parse(await file.async("string"));
+
+				walkRecursive(content,file.name);
+				zip.file(file.name,JSON.stringify(content,null,"\t"));
+
+				progressBar.value=++done;
+				// console.log(`Done ${done}/${tEntries.length}`);
+			};
+
+			let loc = "Writing localizations files: ";
+
+			progressText.textContent = loc;
+
+			let langs = {
+				"russian.xml":true,
+				"english.xml":true,
+				"armenian.xml":true,
+				"chinese.xml":true,
+				"czech.xml":true,
+				"german.xml":true,
+				"hungarian.xml":true,
+				"french.xml":true,
+				"italian.xml":true,
+				"korean.xml":true,
+				"polish.xml":true,
+				"portuguese.xml":true,
+				"spanish.xml":true
+			}
+
+			let ldir = zip.folder("Localization");
+			progressBar.max=Object.keys(langs).length;
+
+			for(let lang of Object.keys(langs)){
+
+				let _loc = loc + lang + ", ";
+
+				progressText.textContent = _loc + "creating file";
+
+				let file = ldir.file(new RegExp("^"+lang,"i"))[0];
+				let xmlString;
+				if(file){
+					xmlString = await file.async("string");
+				} else {
+					xmlString = `\x3c?xml version="1.0" encoding="UTF-8"?>\x3cresources>\x3c/resources>`;
+				}
+
+				progressText.textContent = _loc + "file created";
+
+				if(!langs[lang]){
+					continue;
+					progressBar.value++;
+				};
+
+				progressText.textContent = _loc + "parsing file";
+
+				let parser = new DOMParser();
+				let xmlDoc = parser.parseFromString(xmlString, "text/xml");
+
+				progressText.textContent = _loc + "parsing done, processing";
+
+				try{
+					localizations.forEach(([name,value])=>{
+							if(xmlDoc.querySelectorAll(`*[name='${CSS.escape(name)}']`).length>0)return;
+
+							progressText.textContent=_loc+name;
+
+							let s = xmlDoc.createElement("string");
+							s.setAttribute("name",name);
+							s.textContent=value;
+
+							xmlDoc.children[0].appendChild(s);
+					});
+				} catch (e){
+					progressBar.value = 0;
+					progressText.innerHTML = "Error occurred while processing xml, try using another browser, if it doesn't help, make screenshot of text below and send it to juh9870<br><code>"+e.toString()+"</code>";
+					throw e;
+				}
+
+				progressText.textContent = _loc+"processing done, serializing";
+
+				let serializer = new XMLSerializer();
+				let xmlOutString = prettifyXml(serializer.serializeToString(xmlDoc));
+
+				progressText.textContent = _loc + "writing file";
+
+				ldir.file(lang[0].toUpperCase()+lang.substr(1),xmlOutString);
+				progressBar.value++;
+			}
+
+			progressText.textContent = loc + "done, waiting for archiving";
+
+
+			// console.log("archiving");
+			progressBar.removeAttribute("value");
+			progressText.textContent="Archiving...";
+			let blob = await zip.generateAsync({type:"blob"});
+			download(blob, fileInput.files[0].name, "application/zip");
+			// console.log("done!");
+			progressBar.value=progressBar.max=1;
+			progressText.textContent="Done, if download doesn't starts, try using another browser"
+		});
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+INSTALLATION
+------------
+
+Apple Mac OS X
+
+prerequisites: Apple's X11.app (available from www.apple.com), 
+               IDL virtual machine installed in a unix binary path
+	       (available from www.ittvis.com)
+
+(1) move the whole iMtools folder to the system-wide /Applications folder 
+(2) double-klick on the iMtools icon to launch the program
+
+The iMtools Cocoa Application is just a launcher. It dies immediately
+after launching. This is the expected behaviour! It may take a few
+seconds until the IDL VM window pops up. Simply be patient. 
+
+
+
+LinuX
+
+prerequisites: X11  
+               IDL virtual machine installed in a unix binary path
+	       (available from www.ittvis.com)
+
+(1) move the whole iMtools folder e.g. to /usr/local 
+(2) change directory to the installation path and launch iMtools 
+    using the command 'idl -vm=iMtools.sav'
+    You may want to create a shell script in a unix binary path
+    to do that for you.
+
+
+
+Windows
+
+prerequisites:  
+               IDL virtual machine
+	       (available from www.ittvis.com)
+
+(1) move the whole iMtools folder anywhere you want 
+(2) double-klick on the iMtools.sav icon to launch the program
+
+
+LICENSE
+-------
+
+iMtools will run in a basic mode witout any license. Advanced 
+procedures will be operational only with a machine-based license.
+If you are interested in getting a license then simply follow the
+instructions that are displayed upon program start. 

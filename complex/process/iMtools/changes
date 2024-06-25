@@ -1,0 +1,359 @@
+MODIFICATION HISTORY
+
+v0.99 pl 52 / 25.08.2006
+- abstract Simulated Annealing algorithm
+
+v0.99 pl 51 / 23.08.2006
+- fixed a severe bug in the wave tool:
+  previously, nested loops with angle/magnitude combinations were faulty
+  single loops were correct
+- added the wave tool animation dialog
+
+v0.99 pl 50 / 14.08.2006
+- several bug fixes were done to increase the crash stability 
+
+v0.99 pl 49 / 05.08.2006
+- multiple 2D double peak regression 
+- feature extraction for regression routines
+- minumium curvature surface procedure Macros -> 2D Map Plot -> Min Curve Surface
+  (zeros are treated as missing points)
+
+v0.99 pl 48 / 11.07.2006
+- implemented contour map function
+   Macros -> 2D Map Plot -> Contour Map
+
+v0.99 pl 47 / 02.07.2006
+- implemented phase cross-correlation 
+- Wave Tool: aberration coefficient values can be stored to a file now  
+- RGB png output 
+
+v0.99 pl 46 / 26.05.2006
+- Import of Emispec ESD data v 3.x (.ser files)
+  with automatic endian detection
+
+v0.99 pl 45 / 22.05.2006
+- Import of xy-data capabilities extended
+- Sub-pixel alignment of group images by provided data set, via context menu in
+   Group Tab - Align By Data
+- verbose output for old tvips data format
+
+v0.99 pl 44 / 24.04.2006
+- Enhanced averaging routines for group images: boxcar and gaussian
+   averaging
+   find it under Integration/Averaging in the group tab context menu
+   in the Controls Window
+
+v0.99 pl 43 / 14.03.2006
+- Peak image formed by 2D fit functions available
+- 2D peak fit with modified lorentzian available
+
+v0.99 pl 42 / 21.02.2006
+- StripeTEM Dialog 
+- modified XBox.pro, keywords FIXX and FIXY
+
+v0.99 pl 41 / 29.12.2005
+- integrated activity monitor into the console Window
+
+v0.99 pl 40 / 04.12.2005
+- reimplemented Preferences dialog for the 2D profile regression
+- Gaussian or Lorentzian 2D profiles are choosable now
+-  transfomation from rectangular to polar coordinates under
+   Transformations->Geometric->Polar Transformation
+
+v0.99 pl 39 / 26.11.2005
+- elliptical Gaussian fit with proper alignment of the tilt azimuth
+   is now default, switch tilt azimuth fit off via 'Measure -> Peak
+   Search -> Gauss Fit Preferences ...'
+- minor bug fix: close operation in working directory dialog
+- changes to the magnifying glass dialog
+- Negative function under 'Transformations -> Arithmetics -> Op(Image)
+   -> Negative <-> Positive'
+- import of pixel coordinates previously saved from iMtools (via the context
+   menu in the data tab), the pixel coordinates can be re-applied in
+   the peak finding routines 
+
+v0.99 pl 38 / 26.10.2005
+- implemented shear warp function, find it under 
+   Macros -> Undistort CCD Images -> Shear Distortion
+- added a preferences dialog, File->Preferences
+   a display scope tab replaces the previously used dialog window
+- User preferences files ($HOME/iMtools.pref) are now read and written 
+- added a desktop directory which is also stored in the preferences
+   file
+- the file IO dialog now has a 'desktop directory' and 'cycle through
+   recent directories' button
+- added the FFT Filter utility which makes explicitly use of the
+   sampling data: Macros -> FFT Filter
+
+v0.99 pl 37 / 01.10.2005
+- no flashing anymore of the file dialog window upon directory change
+- changed PlaceWidget
+- implemented amplitude minimum search for the wave tool utility 
+
+v0.99 pl 36 / 24.09.2005
+- Virtual Display Scope
+   The user can now declare a rectangular region on the 
+   screen. iMtools windows will pop up within this region.
+   File -> Preferences -> Display Scope
+- Complex data type images can now be displayed as amplitude, real part
+   or imaginary part. The tag can be set for an individiual image or
+   group via the item 'Amp-Re-Im' in the context menu of the 'Images'
+   tab in the 'Images Groups Data' control panel.
+
+v0.99 pl 35 / 25.08.2005
+- correction for an elliptical CCD image distortion
+- changed colour and graphics mode for selection tools
+
+v0.99 pl 34 / 22.08.2005
+- re-implemented the representation of data arrays
+   data arrays now have four dimensions
+   dim 1 = set no
+   dim 2 = image no
+   dim 3 = set col no
+   dim 4 = data col
+- re-implemented the data export function
+- re-implemented the data plot function
+- sequence of line profiles in a single image or a group of images 
+- minor bug fixes 
+
+v0.99 pl 33 / 11.07.2005
+- bug fix in MergeReIm in ComplexDataOps
+- bug fix in XAberrations.pro: corrected C31 term in loop processing
+- FEI .ebn data import
+- unsigned int and unsigned long are now supported
+- improvements in the holography macro
+- split of package into free and non-free version
+
+v0.99 pl 32 / 26.05.2005
+- minor bug fix in XSegment.pro for Windows XP
+
+v0.99 pl 31 / 05.05.2005
+- minor bug fixes
+
+v0.99 pl 30 / 22.04.2005
+- Aberration dialog can be used as wave tool
+  to apply phase plates to an experimental or 
+  to a simulated wave function
+- reimplemented the progress bar
+
+v0.99 pl 29 / 17.04.2005
+- line scan output includes angle 
+  and accounts for the sampling data 
+
+v0.99 pl 28 / 12.04.2005
+- xmgrace readable data output
+
+v0.99 pl 27 / 10.04.2005
+- re-implemented the calculation of the wave aberration function:
+   - faster
+   - up to 6th order in g
+   - double-loops!
+   - non-isotropic sampling
+  EM-Simulation -> Wave Aberration
+- re-organized the main menu
+
+v0.99 pl 26 / 27.03.2005
+- bug fixed in lh_pickfile, now only one instance at a time
+  event handling is not passed to xmanager anymore
+- bug fixed in ROT90 
+
+v0.99 pl 25 / 03.03.2005
+- corrected a bug in PeakFind: do not pass err=0 to mpfit!
+- improved error handling for the majority of routines!
+
+v0.99 pl 24 / 19.02.2005
+- improved error handling (at least for the macros)
+- export to GIF, PICT  and Digital Micrograph 2.5 (the latter untested)
+- corrected typo in save file dialog widget
+
+v0.99 pl 23 / 17.02.2005
+- geometric distortion correction for EMS files
+- file dialog widgets reimplemented from scratch
+
+v0.99 pl 22 / 28.01.2005
+- Multislice calculation from EMS .sli files
+  Macros -> Image Calculation -> Multislice Calculation
+  allows nested looping over two selectable parameters 
+  (thickness, tilt, tilt azimuth, absorption, resolution, ...) 
+  envelope functions are selectable (step function, gaussian, ...)
+
+v0.99 pl 21 / 28.01.2005
+- first implementation of the SpecThick Macro
+
+v0.99 pl 20 / 13.01.2005
+- IMPORTANT: binaries are compiled with IDL v 6.1
+  for GIF support and will not run under previous IDL versions
+- Import of GIF files and animated GIF files
+- Animated GIF export works out of the box and for any platform,
+- colourtable selection works now also for the Mac
+- now checks for possible permission errors during file export
+
+v0.99 pl 19 / 01.01.2005
+- Added a dialog for renaming the pointer list
+  entries in the image list, group list and data list.
+  The dialog is accessible via the context menues in the Images, Groups & Data
+  dialog window.
+- optimization in the performance of the radial scan routine
+- error estimates for the parameters of a gaussian peak fit; 
+  see Measure -> Peak Search -> Gauss Fit Preferences for further
+  explanation
+
+v0.99 pl 18 / 30.10.2004
+- Added a Cross-Correlation procedure
+  correlates two images via FFT
+  the mean value is subtracted before the FFT operation
+  the result (FFT*Conj(FFT)) is normalized to the product
+  of the standard deviation for the two images in real space 
+- Magnifying glass: magnification > 1 adjustable
+  auto contrast parameter in the Contrast Control Panel is 
+  recognized
+- menue entry for rereading the preferences file during runtime  
+
+v0.99 pl 17 / 26.10.2004
+- Mac OS X Launcher App thanks to Cocoa & AppleScript Studio!!!
+- Included CCD conversion factor in the isochromaticity macro
+  and its preferences; corrected the covariance term in the 
+  error propagation for the extremum position
+- Pixel read dialog now displays image data continuously during mouse motion
+- Corrected Detection Noise functions
+- corrected a bug in the stack template
+- corrected a bug in the rectangular box selection dialog for 
+  the Youngs fringes macro
+- included a simple magnifying glass function (Utils->Magnifying Glass)
+  with continuous contrast evaluation for the ROI
+  still to be implemented: magnification > 1
+- Unary Sqrt function
+
+v0.99 pl 16 / 16.10.2004
+- Youngs fringes macro
+- double loop and single loop processing are now choosable
+  in case both arguments for a binary image operation are groups 
+
+v0.99 pl 15 / 05.10.2004
+- corrected a bug in the fft handling 
+- corrected a bug in the preferences load sequence
+- centre of mass calculation added to the nanodiffraction macro 
+  including a simple cut filter for noise contributions
+  to the fft 
+
+v0.99 pl 14 / 15.09.2004
+- error estimates for the isochromaticity macro
+- refinement for .dm3 import: now imports 3D array data
+  as a stack of 2D images into a group
+  important e.g. for ESI images
+- interactive Au Debye-Scherrer ring scaling routine
+- working directory quick access interface (XWorkingDir.pro)
+- preferences are now stored to a file and reread upon program start
+  (see Preferences.pro), GUI panel is still missing however
+- close down procedures moved to file CloseDown.pro 
+- GUI progress bars added
+
+v0.99 pl 13 / 14.08.2004
+- first implementation of the isochromaticity macro
+
+v0.99 pl 12 / 06.08.2004
+- smart window placement for dialog windows
+- reciprocal space disc macro
+- log operation
+- simple lin, log and exp. grayscale colormaps for the display
+
+v0.99 pl 11 / 30.07.2004
+
+- added a console window for error messages and comments 
+- window placement tweakings
+- merge function for adding group images
+- some minor modifications for the windows platform
+
+v0.99 pl 10 / 08.06.2004
+
+- added region statistics inside a polygon
+- reimplemented the CollectPoints procedure, the user
+  can now select whether the marked positions have to be 
+  refined e.g. by a gaussian fit to a local extremum 
+
+v0.99 pl 09 / 21.05.2004
+
+- first compiled cross-platform version for use without licence 
+  requirements and first double-click app for Windows 
+- made XSimpleDialog blocking, non-blocking version
+  lead to infinite loop in the virtual machine implementation
+- branches to CONGRID in case REBIN is called with complex valued array
+- corrected bug in FUJI image plate quick load function when called 
+  with byte order swapping option  
+
+v0.99 pl 08 / 12.05.2004
+
+- added a quick load function for scaled Image Plate data
+
+v0.99 pl 07 / 02.04.2004
+
+- refined the Digital Micrograph 3.x import routine
+
+v0.99 pl 06 / 15.02.2004
+
+- added the four point definition option in UnitCellSampling.pro
+- refined the algorithm in FindScaling in UnitCellSampling.pro
+  to account for the image scaling error 
+- added Gauss Fit option for subpixel measurement of unit cell 
+  points in the unit cell sampling and averaging macro   
+
+v0.99 pl 05 / 13.02.2004
+
+- added "Measure Unit Cell Positions on Different Image" feature
+  to the UnitCellSampling macro
+- fixed a bug in Distort_Im
+- implemented a work-around for an IDL bug in PolyFillV affecting
+  the accuracy of the unit cell averaging procedure 
+
+v0.99 pl 04 / 09.01.2004
+
+- implemented binary operations with a scalar, so that you
+  can add, multiply a scalar or subtract the image from a constant
+  or divide a constant by the image 
+- supports import of GATAN Digital Micrograph 2.5 formatted files 
+- supports import of GATAN Digital Micrograph 3.x formatted files 
+  (hint: setting the 'DEBUG' keyword in the call to the function
+   Read_DM3x in the source file 'FileIO.pro' will provide excessive 
+   and extremely valuable parser output for the 3.x formatted files!!!)
+- colortable support for 16bit and 24bit color displays, not fully functional
+  works for colourful images only on the screen   
+
+v0.99 pl 03 / 28.12.2003
+
+- replaced XLine.pro by NewLine.pro for better
+  interactive handling in the Line Dialog 
+
+v0.99 pl 02 / 26.11.2003
+
+- Included 'ProgrammersManual.html' as a minimum of 
+  documentation
+- Windows compatibility workarounds:
+  Removed bug in the SplitPath procedure.
+  Corrected interactive mouse selection routines for an ugly 
+  windows event handling failure in Direct Graphics mode.
+  Routines affected are XPoint, XBox, XLine, XCircle, XSegment
+- Improved boundary checking in XPoint, XBox, XLine, XCircle
+- Added Preferences.pro, a file containing procedures 
+  declaring user relevant preference settings, e.g. the mouse button
+  assignment.   
+- mouse button assignments now in general:
+  left button -> position object
+  middle button -> resize object
+  right button -> accept and leave
+
+v0.99 pl 01 / 24.11.2003
+
+- Animated gif export is functional now.
+  Requires ppmtogif included in the netpbmplus package
+  available at http://sourceforge.net/projects/netpbm/
+  and the gifsicle utility available at http://www.icir.org/kohler/
+  Look into the source code in AnimatedGif.pro for details.
+  Tested under unix derivates, likely not working under Windoze.
+- Moved startup commands from GUI.idl to Startup.pro.
+- Now catches window deletion error and program stop when 
+  the user has closed a window using the window manager's 
+  close button.
+- Now includes a width limit option in the 2D Gaussian peak fit
+  routine and extended output of the fit data.
+- Now includes ppm image format export and import.
+- Some minor corrections in XSimpleDialog.pro.

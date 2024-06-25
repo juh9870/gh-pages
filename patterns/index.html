@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SVG.js</title>
+  <script src="./lib/svg.min.js"></script>
+  <script src="./lib/download.js"></script>
+</head>
+<body>
+<body>
+	<label>rows <input id="y" type="number" value="4"/></label>
+	<label>columns <input id="x" type="number" value="4"/></label>
+	<br>
+	<label>scale X <input id="sx" type="number" value="30"/></label>
+	<label>scale Y <input id="sy" type="number" value="30"/></label>
+	<br>
+	<label>offset X <input id="ox" type="number" value="0"/></label>
+	<label>offset Y <input id="oy" type="number" value="0"/></label>
+	<br>
+	<label>Unequal mode <input id="diff" type="checkbox"/></label>
+	<br>
+	<label>Line Width <input id="line" type="number" value="1"/></label>
+	<br>
+	<label>Figure <select id="fig">
+			<option value="tri">Triangle</option>
+			<option value="sqr">Square</option>
+			<option value="hex">Hex</option>
+		</select>
+	</label>
+	<br>
+	<input type="button" value="generate" onclick="generate();" />
+	<input type="button" value="download" onclick="if(!draw)generate();download(draw.svg(),'file.svg');" />
+	<hr>
+	<svg id="result"/>
+	<script>
+
+		let draw=window.draw;
+
+		function _get(id){
+			return document.getElementById(id);
+		}
+		function get(id){
+			return _get(id).value;
+		}
+
+		const s = {
+			get x(){
+				return Number(get("x"));
+			},
+			get y(){
+				return Number(get("y"));
+			},
+			get sx(){
+				return Number(get("sx"));
+			},
+			get sy(){
+				return Number(get("sy"));
+			},
+			get ox(){
+				return Number(get("ox"));
+			},
+			get oy(){
+				return Number(get("oy"));
+			},
+			get figure(){
+				return get("fig");
+			},
+			get uneq(){
+				return _get("diff").checked;
+			},
+			get line(){
+				return Number(get("line"));
+			}
+		}
+
+		function lines(index){
+			if(s.figure==="tri"&&s.oy%2===1)index+=0.5;
+			return Math.sqrt(3)/2*index;
+		}
+
+		function polygon(...points){
+			let arr = new SVG.PointArray(points.map(([a,b])=>{
+				return [a*s.sx+s.line,b*s.sy+s.line];
+			}));
+			draw.polygon(arr.toString()).fill("none").stroke({color:"#000", width:s.line});
+		}
+
+		function triangles(){
+			for(let y=0;y<s.y;y++){
+				if((y+s.oy)%2===0){
+					let ty = lines(y/2);
+					let by = lines(y/2+1);
+					let ox = (y+s.oy)%4===0?0.5:0;;
+					for(let x=0;x<s.x;x++){
+
+						if(s.uneq && (y+s.oy)%4===0 && x===s.x-1)continue;
+
+						polygon([x+ox,ty],[x+ox+1,ty],[x+ox+0.5,by]);
+					}
+				}
+				if((y+s.oy)%2===1){
+					let ox = (y+s.oy)%4===3?0.5:0;
+					let ty = lines((y-1)/2);
+					let by = lines((y-1)/2+1);
+					for(let x=0;x<s.x;x++){
+
+						if(s.uneq && (y+s.oy)%4===3 && x===s.x-1)continue;
+
+						polygon([x+ox,by],[x+ox+1,by],[x+ox+0.5,ty]);
+					}
+				}
+			}
+		}
+		function triDims(){
+			return [(s.x+0.5)*s.sx,lines(s.y)*s.sy]
+		}
+
+		function hex(){
+			for(let y=0;y<s.y;y++){
+
+				let _ty = lines(y*2);
+				let _my = lines(y*2+1);
+				let _by = lines(y*2+2);
+
+				let _ox = (y+s.oy)%2===0?0:0;
+				for(let x=0;x<s.x;x++){
+
+					if(s.uneq && (x+s.ox)%2===1 && y===0)continue;
+
+					let ty=_ty;
+					let my=_my;
+					let by=_by;
+					let ox = _ox;
+
+					if((x+s.ox)%2===0){
+						ty=_my;
+						my=_by;
+						by=lines(y*2+3);
+					}
+
+					polygon([x*1.5+0.5+ox,ty],
+						[x*1.5+0.5+ox+1,ty],
+						[x*1.5+2+ox,my],
+						[x*1.5+0.5+ox+1,by],
+						[x*1.5+0.5+ox,by],
+						[x*1.5+ox,my]);
+				}
+			}
+		}
+		function hexDims(){
+			return [(s.x*1.5+1)*s.sx,lines(s.y*2+1)*s.sy];
+		}
+
+		function squares(){
+			for(let y=0;y<s.y;y++){
+				for(let x=0;x<s.x;x++){
+					polygon([x,y],[x+1,y],[x+1,y+1],[x,y+1]);
+					/*line([x,y],[x+1,y]);
+					line([x+1,y],[x+1,y+1]);
+					line([x+1,y+1],[x,y+1]);
+					line([x,y+1],[x,y]);*/
+				}
+			}
+		}
+		function sqrDims(){
+			return [s.x*s.sx,s.y*s.sy];
+		}
+
+		function generate(){
+
+			let figure = s.figure;
+			let func;
+			let dims;
+
+			// debugger;
+
+			switch(figure){
+				case "tri":
+					func=triangles;
+					dims=triDims();
+					break;
+				case "hex":
+					func=hex;
+					dims=hexDims();
+					break;
+				case "sqr":
+					func=squares;
+					dims=sqrDims();
+					break;
+			}
+
+			draw = SVG("#result").size(dims[0]+s.line*2,dims[1]+s.line*2);
+			__drawn = new Set();
+			draw.clear();
+			func();
+		}
+	</script>
+</body>
+</html>
